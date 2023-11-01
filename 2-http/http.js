@@ -6,7 +6,7 @@ import { promises as fs } from 'fs'
 
 
 // Path to the JSON data
-const PET_FILE_PATH = '../pets.json';
+const PET_FILE_PATH = './pets.json';
 
 
 // Create HTTP server
@@ -25,9 +25,14 @@ const server = http.createServer(async (req, res) => {
     };
 
 
-    const notFound = async () => {
+    const notFound = () => {
         responseText(404, 'Not Found')
     };
+
+
+    const unknownMethod = () => {
+        responseText(405, 'Method not allowed')
+    }
 
 
     const getPetsObj = async () => {
@@ -42,52 +47,45 @@ const server = http.createServer(async (req, res) => {
     };
 
 
+    const getPetByIndex = async (index) => {
+        console.log(index);
+        const pets = await getPetsObj();
+        if (index >= pets.length || index < 0) {
+            notFound();
+        } else {
+            responseJSON(200, pets[index])
+        }
+    }
+
+
     // Parse url and format it
     const urlParsed = url.parse(req.url, true);
-    console.log(urlParsed)
     const sanatizedPath = urlParsed.path.replace(/^\/+|\/+$/g, '');
-    const urlParts = sanatizedPath.split('/');
-    console.log(urlParts)
+    const urlParts = sanatizedPath.split('/');    
 
 
     if (req.method === 'GET') {
         switch (urlParts[0]) {
             case 'pets':
-                console.log('working')
-                res.writeHead(200, {'Content-Type':'text/plain'});
-                res.end('Working!')
+                if (urlParts.length === 1) {
+                    await processGetPets();
+                } else if (urlParts.length === 2 && !isNaN(parseInt(urlParts[1],10))) {
+                    getPetByIndex(parseInt(urlParts[1],10));
+                } else {
+                    notFound();
+                }
+                break;
+            default:
+                notFound();
+                break;
         }
+    } else {
+        unknownMethod();
     }
 })
-
-
-
-
 
 
 const PORT = 3000;
 server.listen(PORT, () => {
     console.log('Server Running')
 });
-
-
-
-// import { createServer } from 'http';
-
-// const server = createServer((req, res) => {
-//   // req.url contains the path and query string of the request (if any)
-//   if (req.url === '/') {
-//     // Use res to write the HTTP response
-//     res.writeHead(200, { 'Content-Type': 'text/plain' }); // Set the status code and headers
-//     res.end('Hello, World!'); // Send the response body and close the connection
-//   } else {
-//     // Handle other paths or send a 404 Not Found response
-//     res.writeHead(404, { 'Content-Type': 'text/plain' });
-//     res.end('Not Found');
-//   }
-// });
-
-// const PORT = 3000;
-// server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
