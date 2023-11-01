@@ -15,23 +15,31 @@ const server = http.createServer(async (req, res) => {
     function responseJSON(statusCode, dataObj) {
         res.writeHead(statusCode, {'Content-Type':'application/json'});
         res.end(JSON.stringify(dataObj));
-    }
+    };
 
 
     // Function to respond with status code and text data
     function responseText(statusCode, message) {
         res.writeHead(statusCode, {'Content-Type':'text/plain'});
         res.end(message);
-    }
+    };
 
 
-    const getPetObj = async () => {
+    const notFound = async () => {
+        responseText(404, 'Not Found')
+    };
+
+
+    const getPetsObj = async () => {
         const petData = await fs.readFile(PET_FILE_PATH, 'utf8');
         return JSON.parse(petData);
-    }
+    };
 
 
-    
+    const processGetPets = async () => {
+        const pets = await getPetsObj();
+        responseJSON(200, pets);
+    };
 
 
     // Parse url and format it
