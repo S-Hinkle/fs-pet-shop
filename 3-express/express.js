@@ -8,11 +8,48 @@ const PET_FILE_PATH = './pets.json';
 // Create an Express application
 const app = express();
 
+// Use middleware to parse JSON bodies
+app.use(express.json());
+
 // Function to retrieve and parse the pets data from the JSON file
 const getPetsObj = async () => {
   const petData = await fs.readFile(PET_FILE_PATH, 'utf8');
   return JSON.parse(petData);
 };
+
+// Function to save the pets data to the JSON file
+const savePetsObj = async (pets) => {
+  const petData = JSON.stringify(pets, null, 2);
+  await fs.writeFile(PET_FILE_PATH, petData, 'utf8');
+};
+
+
+
+// POST endpoint to add a new pet
+app.post('/pets', async (req, res) => {
+  try {
+    // Get the new pet data from the request body
+    const newPet = req.body;
+    console.log(req)
+    // Simple validation
+    if (!newPet.age || !newPet.kind || !newPet.name) {
+      return res.status(400).send('Bad Request: Missing pet name or type');
+    }
+
+    const pets = await getPetsObj();
+    // Add the new pet to the existing array
+    pets.push(newPet);
+    // Save the updated array back to the file
+    await savePetsObj(pets);
+
+    // Send back the added pet data with a 201 Created status code
+    res.status(201).json(newPet);
+  } catch (error) {
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 // Define a route to handle GET requests for the list of all pets
 app.get('/pets', async (req, res) => {
@@ -54,3 +91,5 @@ const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
