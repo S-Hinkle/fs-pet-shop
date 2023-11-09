@@ -10,13 +10,8 @@
     "name": "Buttons"
   },
   {
-    "age": 10,
-    "kind": "snake",
-    "name": "Severous"
-  },
-  {
-    "age": 15,
-    "kind": "dog",
-    "name": "Blue"
+    "age": 34,
+    "kind": "cat",
+    "name": "Zeus"
   }
 ]
