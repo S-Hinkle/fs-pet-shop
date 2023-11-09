@@ -6,8 +6,8 @@
             "port": 5432,
             "askForPassword": true,
             "driver": "PostgreSQL",
-            "name": "testConnection",
-            "database": "mynewdatabase",
+            "name": "Pet Shop",
+            "database": "pets_database",
             "username": "postgres"
         }
     ]
